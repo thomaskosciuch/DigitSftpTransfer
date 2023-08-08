@@ -19,8 +19,8 @@ class Digit2NbinStack(Stack):
     Moves data from DIGIT FTP to NBIN FTP 
     """
 
-    cron_schedule = aws_events.Schedule.cron(
-        minute='10', hour='*', month='*', week_day='TUE-SAT', year='*')
+    cron_schedule: aws_events.Schedule = aws_events.Schedule.cron(
+        minute='10', hour='*', month='*', week_day='*', year='*')
 
     def cron(self, aws_events, cycle) -> aws_events:
         return aws_events.Rule(
@@ -28,7 +28,7 @@ class Digit2NbinStack(Stack):
             schedule=cycle,
         )
 
-    def __init__(self, scope: Construct, construct_id='d1g1t_nbin_transfer', **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id='digitNbinTransfer', **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         self.name: str = construct_id
 
@@ -37,7 +37,7 @@ class Digit2NbinStack(Stack):
             self.name,
             runtime=aws_lambda.Runtime.PYTHON_3_9,
             code=aws_lambda.Code.from_asset(
-                "sftp_transfer_lambda",
+                self.name,
                 bundling=BundlingOptions(
                     image=aws_lambda.Runtime.PYTHON_3_9.bundling_image,
                     command=[
@@ -54,7 +54,7 @@ class Digit2NbinStack(Stack):
         policy_statement = aws_iam.PolicyStatement(
             # principals=[aws_iam.AnyPrincipal()],
             actions=[
-                "cloudformation:*"
+                "cloudformation:*",
                 "cloudwatch:DeleteAlarms",
                 "cloudwatch:DescribeAlarms",
                 "cloudwatch:GetMetricData",
