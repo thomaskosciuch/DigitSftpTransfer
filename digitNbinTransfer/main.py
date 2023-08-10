@@ -1,9 +1,12 @@
 from os import environ
 from typing import TypedDict, Required, LiteralString
 from io import StringIO
+from datetime import datetime
+from pytz import timezone
 
 from paramiko import SFTPAttributes, RSAKey
 from pysftp import Connection, CnOpts
+from send_email import send_email, format_successful_email, format_failed_email
 
 class DigitCredentials(TypedDict):
     digit_sftp_ppk: Required[str]
@@ -16,7 +19,9 @@ class DigitCredentials(TypedDict):
     sentry_dsn: Required[str]
 
 SOURCE_DIRECTORY: LiteralString = '/trade-orders/mf-trades'
-DESTINATION_DIRECTORY: LiteralString = ''
+DESTINATION_DIRECTORY: LiteralString = '/users/ETFCM/d1g1t/MFOE/Inbox/'
+DEFAULT_EMAIL: LiteralString = 'thomas@qwealth.com'
+
 
 def nbin_sftp_connection() -> Connection:
     cnopts = CnOpts()
@@ -48,7 +53,6 @@ def handler(event, context):
 
     IDENTIFIER: LiteralString = 'dmfQWEA'
 
-
     digit_connection: Connection = digit_sftp_connection()
     source_files: list[SFTPAttributes] = digit_connection.listdir_attr(SOURCE_DIRECTORY)
     source_files: list[SFTPAttributes] = list(filter(lambda file: IDENTIFIER in file.filename, source_files))
@@ -72,10 +76,31 @@ def handler(event, context):
             files_to_add.append(source_file)
         else:
             files_to_add.append(source_file)
+    
+    if len(files_to_add) == 0:
+        return
 
+
+    def get_length() -> int:
+        return 1
+
+    length = 0
     for file in files_to_add:
         print(f'ADD FILE: {file}')
+        length += get_length()
     
+    return
+    #i don't want to send emails yet...
+
+    success=True
+    files_to_add = ['a','b','c']
+
+    if success:
+        length=3324
+        message = format_successful_email(length, DESTINATION_DIRECTORY)
+    else:
+        message = format_failed_email(len(files_to_add))
+    send_email(message)
 
 
 if __name__ == "__main__":
