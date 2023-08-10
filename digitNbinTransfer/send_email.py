@@ -1,28 +1,18 @@
 from datetime import datetime
-from typing import TypedDict, LiteralString
+from io import TextIOWrapper
 
 from boto3 import client
 from num2words import num2words
 from pytz import timezone
 
-class SesContentBlock(TypedDict):
-    Body: str
-    Charset: LiteralString #'UFT-8'
-
-class SesBodyBlock(TypedDict):
-    Body: SesContentBlock
-    Html: SesContentBlock
-
-class SesMessage(TypedDict):
-    Subject: SesContentBlock
-    Body: SesContentBlock
+from local_typing import SesMessage
 
 local_datetime = datetime.now(timezone('America/Toronto'))
 
-def format_successful_email(n_transactions, destination) -> SesMessage:
+def format_successful_email(n_transactions: int, destination:str) -> SesMessage:
         SUCCESS_STR: str = """{n_transactions} were successfully sent to NBIN’s FTP folder at {time} on {date}. A copy of the file can be found in {destination}."""
 
-        html_raw = open('success_email.html', 'r')
+        html_raw: TextIOWrapper = open('success_email.html', 'r')
         html_str: str = ""
         for line in html_raw.readlines():
             html_str += line
@@ -45,16 +35,17 @@ def format_successful_email(n_transactions, destination) -> SesMessage:
         }
         return message
 
-def format_failed_email(n_transaction_files: int) -> SesMessage:
+def format_failed_email(n_transaction_files: int, exception_str: str) -> SesMessage:
         FAILED_STR: str = """{n_transaction_files} transactions files failed to upload to NBIN’s FTP folder at {time} on {date}."""
 
-        html_raw = open('failed_email.html', 'r')
+        html_raw: TextIOWrapper = open('failed_email.html', 'r')
         html_str: str = ""
         for line in html_raw.readlines():
             html_str += line
         html_str = html_str.replace('{n_transaction_files}', num2words(n_transaction_files).capitalize()).\
             replace('{time}', local_datetime.strftime('%H:%M:S')).\
-            replace('{date}', local_datetime.strftime('%B %d, %Y'))
+            replace('{date}', local_datetime.strftime('%B %d, %Y')).\
+            replace('{ERROR_STRING}', exception_str)
         _str = FAILED_STR.replace('{n_transaction_files}', num2words(n_transaction_files).capitalize()).\
             replace('{time}', local_datetime.strftime('%H:%M:S')).\
             replace('{date}', local_datetime.strftime('%B %d, %Y'))
@@ -67,8 +58,8 @@ def format_failed_email(n_transaction_files: int) -> SesMessage:
         }
         return message
 
-def send_email(message: SesMessage):
-    ses_client = client('ses')
+def send_email(message: SesMessage) -> None:
+    ses_client = client('ses') #botocore.Client.Base ; but useless type
     ses_client.send_email(
         Source="welcome@qwealth.com",
         Destination={
