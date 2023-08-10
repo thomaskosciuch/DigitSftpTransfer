@@ -8,7 +8,6 @@ def get_files_absent_from_destination(source_connection: Connection, destination
     source_files: list[SFTPAttributes] = list(filter(lambda file: IDENTIFIER in file.filename, source_files))
     source_file_array: list[str] = [file.filename for file in source_files]
     source_file_times: dict[str, int] = {file.filename: file.st_mtime for file in source_files}
-
     destination_files: list[SFTPAttributes] = destination_connection.listdir_attr()
     destination_files: list[SFTPAttributes] = list(filter(lambda file: file.filename in source_file_array, destination_files))
     destination_file_times: dict[str, int] = {file.filename: file.st_mtime for file in destination_files}
