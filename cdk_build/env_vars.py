@@ -1,4 +1,4 @@
-from typing import TypedDict, LiteralString, Required
+from typing import TypedDict, LiteralString, Required, NotRequired
 from aws_cdk import aws_ssm
 
 class DigitCredentials(TypedDict):
@@ -10,6 +10,8 @@ class DigitCredentials(TypedDict):
     nbin_sftp_password: Required[str]
     nbin_sftp_username: Required[str]
     sentry_dsn: Required[str]
+    email_recipient: NotRequired[str]
+    email_sender: Required[str]
 
 DIGIT_FTP_SERVER:LiteralString = 'ca.sftp.d1g1t.com'
 NBIN_FTP_SERVER:LiteralString = 'sftp.corrnet.com'
@@ -33,5 +35,7 @@ def digit_nbin_ftp_env_vars(self) -> DigitCredentials:
         "nbin_sftp_password": nbin_sftp_password,
         "nbin_sftp_server": NBIN_FTP_SERVER,
         "nbin_sftp_username": nbin_sftp_username,
-        "sentry_dsn": sentry_dsn
+        "sentry_dsn": sentry_dsn,
+        # "email_recipients": 'alerts.mftrades@qwealth.com',
+        "email_sender": 'welcome@qwealth.com'
     }
