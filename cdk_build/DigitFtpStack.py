@@ -7,6 +7,7 @@ from aws_cdk import (
     aws_events,
     aws_events_targets,
     aws_iam,
+    aws_ses_actions
 )
 
 from cdk_build.env_vars import digit_nbin_ftp_env_vars
@@ -35,11 +36,11 @@ class Digit2NbinStack(Stack):
         digit_nbin_transfer = aws_lambda.Function(
             self,
             self.name,
-            runtime=aws_lambda.Runtime.PYTHON_3_9,
+            runtime=aws_lambda.Runtime.PYTHON_3_11,
             code=aws_lambda.Code.from_asset(
                 self.name,
                 bundling=BundlingOptions(
-                    image=aws_lambda.Runtime.PYTHON_3_9.bundling_image,
+                    image=aws_lambda.Runtime.PYTHON_3_11.bundling_image,
                     command=[
                         "bash", "-c",
                         "pip install --no-cache -r requirements.txt -t /asset-output && cp -au . /asset-output"
@@ -67,3 +68,32 @@ class Digit2NbinStack(Stack):
         rule = self.cron(aws_events, self.cron_schedule,)
         rule.add_target(aws_events_targets.LambdaFunction(
             digit_nbin_transfer, retry_attempts=10))
+
+    # topic = sns.Topic(self, "Topic")
+
+    # ses.ReceiptRuleSet(self, "RuleSet",
+    #     rules=[ses.ReceiptRuleOptions(
+    #         recipients=["hello@aws.com"],
+    #         actions=[
+    #             actions.AddHeader(
+    #                 name="X-Special-Header",
+    #                 value="aws"
+    #             ),
+    #             actions.S3(
+    #                 bucket=bucket,
+    #                 object_key_prefix="emails/",
+    #                 topic=topic
+    #             )
+    #         ]
+    #     ), ses.ReceiptRuleOptions(
+    #         recipients=["aws.com"],
+    #         actions=[
+    #             actions.Sns(
+    #                 topic=topic
+    #             )
+    #         ]
+    #     )
+    #     ]
+    # )
+
+    # TODO integrate SES
