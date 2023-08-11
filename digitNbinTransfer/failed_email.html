@@ -216,7 +216,7 @@ table{
 }
 .hero .text h2{
 	color: #000;
-	font-size: 30px;
+	font-size: 18px;
 	margin-bottom: 0;
 	font-weight: 300;
 }
@@ -231,7 +231,7 @@ table{
 }
 .heading-section h2{
 	color: #000000;
-	font-size: 28px;
+	font-size: 20px;
 	margin-top: 0;
 	line-height: 1.4;
 	font-weight: 400;
@@ -335,7 +335,7 @@ table{
           	<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
           		<tr>
           			<td class="logo" style="text-align: center;">
-			            <h1><a href="#">D1G1T SFTP TRANSFER</a></h1>
+			            <h1><a href="#">FAILED D1G1T SFTP TRANSFER</a></h1>
 			          </td>
           		</tr>
           	</table>
@@ -344,24 +344,74 @@ table{
 				<tr>
           <td valign="middle" class="hero hero-2 bg_white" style="padding: 4em 0;">
             <table>
-            	<tr>
+				<tr>
             		<td>
-            			<div class="text" style="padding: 0 3em; text-align: center;">
-            				<h2><span>{n_transaction_files}</span> transactions files failed to upload to NBIN’s FTP folder at <span>{time}</span> on <span>{date}</span>.</h2>
+            			<div class="text" style="padding: 0 3em; text-align: left;">
+            				<h2>Failed files:</h2>
+            			</div>
+            		</td>
+					<td>
+            			<div class="text" style="padding: 0 3em; text-align: right;">
+            				<h2><span>{x_files}</span></h2>
             			</div>
             		</td>
             	</tr>
 				<tr>
             		<td>
-            			<div class="text" style="padding: 0 3em; text-align: center;">
-            				<h5>We are looking at your error as we're spying on when things go wrong.</h5>
+            			<div class="text" style="padding: 0 3em; text-align: left;">
+            				<h2>Date:</h2>
+            			</div>
+            		</td>
+					<td>
+            			<div class="text" style="padding: 0 3em; text-align: right;">
+            				<h2><span>{date}</span></h2>
             			</div>
             		</td>
             	</tr>
 				<tr>
             		<td>
+            			<div class="text" style="padding: 0 3em; text-align: left;">
+            				<h2>Time:</h2>
+            			</div>
+            		</td>
+					<td>
+            			<div class="text" style="padding: 0 3em; text-align: right;">
+            				<h2><span>{time}</span></h2>
+            			</div>
+            		</td>
+            	</tr>
+				<tr>
+            		<td>
+            			<div class="text" style="padding: 0 3em; text-align: left;">
+            				<h2>Source:</h2>
+            			</div>
+            		</td>
+					<td>
+            			<div class="text" style="padding: 0 3em; text-align: right;">
+            				<h2><span>{source}</span></h2>
+            			</div>
+            		</td>
+            	</tr>
+				</table>
+				<table>
+				<tr>
+            		<td>
             			<div class="text" style="padding: 0 3em; text-align: center;">
-            				<p><span>{ERROR_STRING}</p>
+            				<h5>We are looking at your error as we're <a href="https://qwealth.sentry.io/issues/?project=6262116">spying</a> on when things go wrong.</h5>
+            			</div>
+            		</td>
+            	</tr>
+				<tr>
+            		<td>
+            			<div class="text" style="padding: 0 3em; font-size: 15px; text-align:center; color:#000000">
+            				<h3><span>Error logs (useful to a developer)</span></h3>
+            			</div>
+            		</td>
+            	</tr>
+				<tr>
+            		<td>
+            			<div class="text" style="padding: 0 3em; font-size: 10px; text-align: left; color:#000000">
+            				<p>{ERROR_STRING}</p>
             			</div>
             		</td>
             	</tr>

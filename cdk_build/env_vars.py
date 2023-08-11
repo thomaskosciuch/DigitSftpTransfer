@@ -10,14 +10,19 @@ class DigitCredentials(TypedDict):
     nbin_sftp_password: Required[str]
     nbin_sftp_username: Required[str]
     sentry_dsn: Required[str]
-    email_recipient: NotRequired[str]
+    email_recipient: NotRequired[list[str]]
     email_sender: Required[str]
+    email_reply_address: Required[str]
+    email_maintainer: Required[list[str]]
 
 DIGIT_FTP_SERVER:LiteralString = 'ca.sftp.d1g1t.com'
 NBIN_FTP_SERVER:LiteralString = 'sftp.corrnet.com'
 
 def digit_nbin_ftp_env_vars(self) -> DigitCredentials:
     get_ssm_value = aws_ssm.StringParameter.value_for_string_parameter
+
+    EMAIL_REPLY_ADDRESS: list[str] = ['mandira@qwealth.com']
+    EMAIL_MAINTAINER: list[str] = ['thomas@qwealth.com'] 
     
     digit_sftp_ppk = get_ssm_value(self, "DIGIT_FTP_PPK")
     digit_sftp_private_key_pass = get_ssm_value(self, "DIGIT_SFTP_PRIVATE_KEY_PASS")
@@ -25,6 +30,7 @@ def digit_nbin_ftp_env_vars(self) -> DigitCredentials:
     nbin_sftp_password = get_ssm_value(self, "SFTP_NBIN_PASSWORD")
     nbin_sftp_username = get_ssm_value(self, "SFTP_NBIN_USERNAME")
     sentry_dsn = get_ssm_value(self, "LAMBDA_SENTRY_DSN")
+    email_recipients = get_ssm_value(self, "DIGIT_EMAIL_LIST")
     
     return {
         "digit_sftp_ppk": digit_sftp_ppk,
@@ -36,6 +42,8 @@ def digit_nbin_ftp_env_vars(self) -> DigitCredentials:
         "nbin_sftp_server": NBIN_FTP_SERVER,
         "nbin_sftp_username": nbin_sftp_username,
         "sentry_dsn": sentry_dsn,
-        # "email_recipients": 'alerts.mftrades@qwealth.com',
-        "email_sender": 'welcome@qwealth.com'
+        "email_sender": 'welcome@qwealth.com',
+        "email_recipients": email_recipients,
+        "email_reply_address": EMAIL_REPLY_ADDRESS,
+        "email_maintainer": EMAIL_MAINTAINER,
     }
