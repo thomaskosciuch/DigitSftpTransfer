@@ -1,3 +1,5 @@
+from typing import Required, LiteralString, TypedDict
+
 class DigitCredentials(TypedDict):
     digit_sftp_ppk: Required[str]
     digit_sftp_server: Required[str]

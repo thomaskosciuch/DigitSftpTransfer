@@ -35,7 +35,7 @@ def format_successful_email(n_transactions: int, destination:str) -> SesMessage:
         }
         return message
 
-def format_failed_email(n_transaction_files: int) -> SesMessage:
+def format_failed_email(n_transaction_files: int, exception_str: str) -> SesMessage:
         FAILED_STR: str = """{n_transaction_files} transactions files failed to upload to NBIN’s FTP folder at {time} on {date}."""
 
         html_raw: TextIOWrapper = open('failed_email.html', 'r')
@@ -44,7 +44,8 @@ def format_failed_email(n_transaction_files: int) -> SesMessage:
             html_str += line
         html_str = html_str.replace('{n_transaction_files}', num2words(n_transaction_files).capitalize()).\
             replace('{time}', local_datetime.strftime('%H:%M:S')).\
-            replace('{date}', local_datetime.strftime('%B %d, %Y'))
+            replace('{date}', local_datetime.strftime('%B %d, %Y')).\
+            replace('{ERROR_STRING}', exception_str)
         _str = FAILED_STR.replace('{n_transaction_files}', num2words(n_transaction_files).capitalize()).\
             replace('{time}', local_datetime.strftime('%H:%M:S')).\
             replace('{date}', local_datetime.strftime('%B %d, %Y'))
@@ -57,7 +58,7 @@ def format_failed_email(n_transaction_files: int) -> SesMessage:
         }
         return message
 
-def send_email(message: SesMessage):
+def send_email(message: SesMessage) -> None:
     ses_client = client('ses') #botocore.Client.Base ; but useless type
     ses_client.send_email(
         Source="welcome@qwealth.com",
