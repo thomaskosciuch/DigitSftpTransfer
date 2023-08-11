@@ -11,7 +11,7 @@ from sentry import init_sentry
 
 def get_length_of_file(filepath: str, source:SFTPClient) -> int:
     with source.open(filepath) as opened_file:
-        return len(opened_file.readlines())
+        return len(opened_file.readlines()) - 1
 
 def transfer_files(files_to_add:list[dict], source: SFTPClient, destination: SFTPClient) -> int:
     length:int=0
@@ -33,16 +33,14 @@ def handler(event, context):
         files_to_add: list[str] = get_files_absent_from_destination(digit_connection, nbin_connection)
         if len(files_to_add) == 0:
             print('no files. Exiting early.')
-            return
-
+            exit()
         cumulative_length_of_transferred_entries:int = 0
         cumulative_length_of_transferred_entries = transfer_files(files_to_add, digit_connection.sftp_client, nbin_connection.sftp_client)
         message = format_successful_email(cumulative_length_of_transferred_entries, DESTINATION_DIRECTORY)
     except Exception as exception:
         message = format_failed_email(len(files_to_add), str(exception))
         capture_exception(exception)
-    finally:
-        send_email(message)
+    send_email(message)
 
 if __name__ == "__main__":
     handler(None, None)
