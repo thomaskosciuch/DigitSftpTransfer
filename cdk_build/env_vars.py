@@ -21,8 +21,8 @@ NBIN_FTP_SERVER:LiteralString = 'sftp.corrnet.com'
 def digit_nbin_ftp_env_vars(self) -> DigitCredentials:
     get_ssm_value = aws_ssm.StringParameter.value_for_string_parameter
 
-    EMAIL_REPLY_ADDRESS: list[str] = ['mandira@qwealth.com']
-    EMAIL_MAINTAINER: list[str] = ['thomas@qwealth.com'] 
+    EMAIL_REPLY_ADDRESS: list[str] = 'mandira@qwealth.com'
+    EMAIL_MAINTAINER: list[str] = 'thomas@qwealth.com'
     
     digit_sftp_ppk = get_ssm_value(self, "DIGIT_FTP_PPK")
     digit_sftp_private_key_pass = get_ssm_value(self, "DIGIT_SFTP_PRIVATE_KEY_PASS")

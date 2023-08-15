@@ -15,6 +15,4 @@ new_mtime: int = stat(new_filepath).st_mtime
 def test_newer_file_age():
     assert older_than(new_mtime, old_mtime) == False
 
-# def test_same_file_age(new_mtime, new_mtime):
-#     == False
 

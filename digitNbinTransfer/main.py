@@ -2,7 +2,7 @@ import traceback
 import sys
 
 from pysftp import Connection
-from sentry_sdk import capture_exception
+from sentry_sdk import capture_exception, add_breadcrumb, capture_message
 from paramiko import SFTPClient
 
 from compare_files import get_files_absent_from_destination
@@ -28,20 +28,24 @@ def transfer_files(files_to_add:list[dict], source: SFTPClient, destination: SFT
 def handler(event, context):
 
     message: SesMessage
+    files_to_add: list[str] = []
 
     try:
         init_sentry()
         digit_connection: Connection = digit_sftp_connection()
         nbin_connection: Connection = nbin_sftp_connection()
-        files_to_add: list[str] = get_files_absent_from_destination(digit_connection, nbin_connection)
-        files_to_add = ['Thomas is testing']
+        files_to_add = get_files_absent_from_destination(digit_connection, nbin_connection)
         if len(files_to_add) == 0:
             print('no files. Exiting early.')
             return
         cumulative_length_of_transferred_entries:int = 0
         cumulative_length_of_transferred_entries = transfer_files(files_to_add, digit_connection.sftp_client, nbin_connection.sftp_client)
+        add_breadcrumb(message='files', category='logging', data = {
+            'n_files': len(files_to_add), 'n_transactions': cumulative_length_of_transferred_entries, 'files': files_to_add
+            })
         message = format_successful_email(cumulative_length_of_transferred_entries, DESTINATION_DIRECTORY)
         send_email(message)
+        capture_message(message='D1G1T NBIN TRANSFER', level='info')
     except Exception as exception:
         traceback_capture:str = str(exception)
         traceback_capture += '\n\n'
