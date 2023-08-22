@@ -20,10 +20,10 @@ class Digit2NbinStack(Stack):
     """
 
     cron_schedule: aws_events.Schedule = aws_events.Schedule.cron(
-        minute='/5', hour='19', month='*', week_day='MON-FRI', year='*') #3pm in UTC
+        minute='/5', hour='20', month='*', week_day='MON-FRI', year='*') #3pm in UTC
 
     cron_schedule_2: aws_events.Schedule = aws_events.Schedule.cron(
-        minute='0', hour='12-18', month='*', week_day='MON-FRI', year='*') #9-5 in UTC
+        minute='0', hour='12-19', month='*', week_day='MON-FRI', year='*') #9-5 in UTC
 
 
     def cron(self, aws_events, cycle, n=0) -> aws_events:
