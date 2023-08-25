@@ -20,11 +20,15 @@ class Digit2NbinStack(Stack):
     """
 
     cron_schedule: aws_events.Schedule = aws_events.Schedule.cron(
-        minute='10', hour='*', month='*', week_day='*', year='*')
+        minute='/5', hour='20', month='*', week_day='MON-FRI', year='*') #3pm in UTC
 
-    def cron(self, aws_events, cycle) -> aws_events:
+    cron_schedule_2: aws_events.Schedule = aws_events.Schedule.cron(
+        minute='0', hour='12-19', month='*', week_day='MON-FRI', year='*') #9-5 in UTC
+
+
+    def cron(self, aws_events, cycle, n=0) -> aws_events:
         return aws_events.Rule(
-            self, "Rule",
+            self, f"Rule{n}",
             schedule=cycle,
         )
 
@@ -67,6 +71,10 @@ class Digit2NbinStack(Stack):
         )
         digit_nbin_transfer.add_to_role_policy(policy_statement)
 
-        rule = self.cron(aws_events, self.cron_schedule,)
+        rule = self.cron(aws_events, self.cron_schedule, 1)
         rule.add_target(aws_events_targets.LambdaFunction(
+            digit_nbin_transfer, retry_attempts=10))
+
+        rule2 = self.cron(aws_events, self.cron_schedule_2, 2)
+        rule2.add_target(aws_events_targets.LambdaFunction(
             digit_nbin_transfer, retry_attempts=10))
