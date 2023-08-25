@@ -9,21 +9,16 @@ from aws_cdk import (
     aws_iam,
 )
 
-from cdk_build.env_vars import digit_nbin_ftp_env_vars
-
 TOPIC_ID = 'digit_upload_topic'
 
 
-class Digit2NbinStack(Stack):
+class CronjobThing(Stack):
     """
-    Moves data from DIGIT FTP to NBIN FTP 
+    rushed cron fix
     """
 
     cron_schedule: aws_events.Schedule = aws_events.Schedule.cron(
-        minute='/5', hour='19-20', month='*', week_day='MON-FRI', year='*') #3pm in UTC
-
-    cron_schedule_2: aws_events.Schedule = aws_events.Schedule.cron(
-        minute='0', hour='12-18', month='*', week_day='MON-FRI', year='*') #9-5 in UTC
+        minute='/15', hour='*', month='*', week_day='*', year='*')
 
 
     def cron(self, aws_events, cycle, n=0) -> aws_events:
@@ -32,7 +27,7 @@ class Digit2NbinStack(Stack):
             schedule=cycle,
         )
 
-    def __init__(self, scope: Construct, construct_id='digitNbinTransfer', **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id='CronjobThing', **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         self.name: str = construct_id
 
@@ -50,8 +45,7 @@ class Digit2NbinStack(Stack):
                     ],
                 )
             ),
-            timeout=Duration.minutes(10),
-            environment=digit_nbin_ftp_env_vars(self),
+            timeout=Duration.minutes(1),
             handler='main.handler'
         )
 
@@ -63,9 +57,6 @@ class Digit2NbinStack(Stack):
                 "cloudwatch:DescribeAlarms",
                 "cloudwatch:GetMetricData",
                 "cloudwatch:PutMetricAlarm",
-                'ses:SendEmail',
-                'ses:SendRawEmail',
-                'ses:SendTemplatedEmail',
             ],
             resources=["*"]
         )
@@ -75,6 +66,3 @@ class Digit2NbinStack(Stack):
         rule.add_target(aws_events_targets.LambdaFunction(
             digit_nbin_transfer, retry_attempts=10))
 
-        rule2 = self.cron(aws_events, self.cron_schedule_2, 2)
-        rule2.add_target(aws_events_targets.LambdaFunction(
-            digit_nbin_transfer, retry_attempts=10))
