@@ -3,6 +3,7 @@ from aws_cdk import (
     Stack,
     BundlingOptions,
     Duration,
+    aws_dynamodb,
     aws_lambda,
     aws_events,
     aws_events_targets,
@@ -20,10 +21,10 @@ class Digit2NbinStack(Stack):
     """
 
     cron_schedule: aws_events.Schedule = aws_events.Schedule.cron(
-        minute='/5', hour='20', month='*', week_day='MON-FRI', year='*') #3pm in UTC
+        minute='/5', hour='19-20', month='*', week_day='MON-FRI', year='*') #3pm in UTC
 
     cron_schedule_2: aws_events.Schedule = aws_events.Schedule.cron(
-        minute='0', hour='12-19', month='*', week_day='MON-FRI', year='*') #9-5 in UTC
+        minute='0', hour='12-18', month='*', week_day='MON-FRI', year='*') #9-5 in UTC
 
 
     def cron(self, aws_events, cycle, n=0) -> aws_events:
@@ -35,6 +36,15 @@ class Digit2NbinStack(Stack):
     def __init__(self, scope: Construct, construct_id='digitNbinTransfer', **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         self.name: str = construct_id
+
+        table = aws_dynamodb.Table(
+            self,
+            "digitTransferTable",
+            partition_key=aws_dynamodb.Attribute(name="id", type=aws_dynamodb.AttributeType.STRING),
+            sort_key=aws_dynamodb.Attribute(name="filename", type=aws_dynamodb.AttributeType.STRING),
+            read_capacity=2,
+            write_capacity=2
+        )
 
         digit_nbin_transfer = aws_lambda.Function(
             self,
@@ -51,7 +61,10 @@ class Digit2NbinStack(Stack):
                 )
             ),
             timeout=Duration.minutes(10),
-            environment=digit_nbin_ftp_env_vars(self),
+            environment= {
+                'DYNAMO_TABLE_NAME': table.table_name,  
+                **digit_nbin_ftp_env_vars(self)
+            },
             handler='main.handler'
         )
 
@@ -69,7 +82,18 @@ class Digit2NbinStack(Stack):
             ],
             resources=["*"]
         )
+        dynamo_statement: aws_iam.PolicyStatement = aws_iam.PolicyStatement(
+            actions=[
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",  
+                "dynamodb:Query",
+                "dynamodb:Scan",
+            ],
+            resources=[table.table_arn],
+        )
+
         digit_nbin_transfer.add_to_role_policy(policy_statement)
+        digit_nbin_transfer.add_to_role_policy(dynamo_statement)
 
         rule = self.cron(aws_events, self.cron_schedule, 1)
         rule.add_target(aws_events_targets.LambdaFunction(

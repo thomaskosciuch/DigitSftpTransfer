@@ -30,7 +30,7 @@ def digit_nbin_ftp_env_vars(self) -> DigitCredentials:
     nbin_sftp_password = get_ssm_value(self, "SFTP_NBIN_PASSWORD")
     nbin_sftp_username = get_ssm_value(self, "SFTP_NBIN_USERNAME")
     sentry_dsn = get_ssm_value(self, "LAMBDA_SENTRY_DSN")
-    email_recipients = get_ssm_value(self, "DIGIT_EMAIL_LIST")
+    email_recipient = get_ssm_value(self, "DIGIT_EMAIL_LIST")
     
     return {
         "digit_sftp_ppk": digit_sftp_ppk,
@@ -43,7 +43,7 @@ def digit_nbin_ftp_env_vars(self) -> DigitCredentials:
         "nbin_sftp_username": nbin_sftp_username,
         "sentry_dsn": sentry_dsn,
         "email_sender": 'welcome@qwealth.com',
-        "email_recipients": email_recipients,
+        "email_recipient": email_recipient,
         "email_reply_address": EMAIL_REPLY_ADDRESS,
         "email_maintainer": EMAIL_MAINTAINER,
     }
