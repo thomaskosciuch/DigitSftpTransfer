@@ -5,11 +5,11 @@ Any uploaded files will be opened and the quantity of rows, which correspond to 
 
 If no files are uploaded, then no files are transfered. No emails are sent.
 
-If for any reason we encounter a failure, an email is sent to the distribution list and recorded in our [error reporting software](https://qwealth.sentry.io/issues/?project=6262116)
+If for any reason we encounter a failure, an email is sent to the distribution list and recorded in our [error reporting software](https://qwealth.sentry.io/issues/?project=6262116).
 
 
 # How it works
-We executing a cron-job using [eventbridge](https://aws.amazon.com/eventbridge/) that triggers a [lambda](https://aws.amazon.com/lambda/) function and moves files from A to B using ssh file transfer protocols ([SFTP](https://en.wikipedia.org/wiki/SSH_File_Transfer_Protocol)).
+We executing a cron-job using [eventbridge](https://aws.amazon.com/eventbridge/) that triggers a [lambda](https://aws.amazon.com/lambda/) function and moves files from A to B using ssh file transfer protocols ([SFTP](https://en.wikipedia.org/wiki/SSH_File_Transfer_Protocol)). It will record all transfer-files in a dynamo db.
 
 ## SFTP
 The lambda is using [pysftp](https://docs.paramiko.org/en/latest/api/sftp.html#paramiko.sftp_client.SFTPClient.open) to create a connection, then I use the exposed the underlying [paramiko](https://docs.paramiko.org/en/latest/index.html) client (able to conduct more advanced operations) to read, and transfer the file.
@@ -19,7 +19,6 @@ If the SFTP file transfer fails or succeeds emails are sent using [SES](https://
 
 # Issues
 - Currently we are using welcome@qwealth.com instead of a not-stupid email
-- Currently I have made the cron-job run every 10 minutes instead of the pattern suggested
 - Currently the error reporting is lacklustre
 
 # How to maintain:
